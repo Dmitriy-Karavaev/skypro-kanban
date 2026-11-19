@@ -4,7 +4,7 @@
       <p>{{ title }}</p>
     </div>
     <div class="cards">
-      <Task v-for="task in tasks" :key="task.id" :task="task" />
+      <Task v-for="task in tasks" :key="task.id" :task="task" @open-task="$emit('open-task', $event)" />
     </div>
   </div>
 </template>
@@ -16,4 +16,6 @@ defineProps({
   title: { type: String, required: true },
   tasks: { type: Array, required: true }
 });
+
+defineEmits(['open-task']);
 </script>

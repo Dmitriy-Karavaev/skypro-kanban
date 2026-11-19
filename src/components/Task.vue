@@ -5,7 +5,7 @@
         <div class="card__theme" :class="themeClass">
           <p :class="themeClass">{{ task.topic }}</p>
         </div>
-        <a href="#" target="_self" @click.prevent>
+        <a href="#" target="_self" @click.prevent="$emit('open-task', task)">
           <div class="card__btn">
             <div></div>
             <div></div>
@@ -14,7 +14,7 @@
         </a>
       </div>
       <div class="card__content">
-        <a href="#" target="_blank" @click.prevent>
+        <a href="#" target="_blank" @click.prevent="$emit('open-task', task)">
           <h3 class="card__title">{{ task.title }}</h3>
         </a>
         <div class="card__date">
@@ -35,6 +35,8 @@ import { computed } from 'vue';
 const props = defineProps({
   task: { type: Object, required: true }
 });
+
+defineEmits(['open-task']);
 
 const themeClasses = {
   'Web Design': '_orange',

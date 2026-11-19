@@ -10,13 +10,9 @@
         </div>
         <nav class="header__nav">
           <button class="header__btn-main-new _hover01" id="btnMainNew">
-            <a href="#" @click.prevent>Создать новую задачу</a>
+            <a href="#" @click.prevent="$emit('create-task')">Создать новую задачу</a>
           </button>
-          <a
-            href="#"
-            class="header__user _hover02"
-            @click.prevent="isUserSetOpen = !isUserSetOpen"
-          >Ivan Ivanov</a>
+          <a href="#" class="header__user _hover02" @click.prevent="isUserSetOpen = !isUserSetOpen">Ivan Ivanov</a>
           <div class="header__pop-user-set pop-user-set" :class="{ _show: isUserSetOpen }">
             <p class="pop-user-set__name">Ivan Ivanov</p>
             <p class="pop-user-set__mail">ivan.ivanov@gmail.com</p>
@@ -24,7 +20,9 @@
               <p>Темная тема</p>
               <input type="checkbox" class="checkbox" name="checkbox">
             </div>
-            <button type="button" class="_hover03"><a href="#" @click.prevent>Выйти</a></button>
+            <button type="button" class="_hover03" @click.prevent="$emit('exit')">
+              <a href="#" @click.prevent="$emit('exit')">Выйти</a>
+            </button>
           </div>
         </nav>
       </div>
@@ -36,4 +34,6 @@
 import { ref } from 'vue';
 
 const isUserSetOpen = ref(false);
+
+defineEmits(['create-task', 'exit']);
 </script>
