@@ -5,7 +5,7 @@
     <main class="main">
       <div class="container">
         <div class="main__block">
-          <div class="main__content">
+          <div v-if="!loading" class="main__content">
             <TaskColumn
               v-for="status in statuses"
               :key="status"
@@ -14,6 +14,7 @@
               @open-task="openTask"
             />
           </div>
+          <div v-else class="loading">Данные загружаются</div>
         </div>
       </div>
     </main>
@@ -38,7 +39,8 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import { tasks as initialTasks } from '../mocks/data.js';
 import BaseHeader from './BaseHeader.vue';
 import TaskColumn from './TaskColumn.vue';
 import NewCardModal from './NewCardModal.vue';
@@ -47,25 +49,20 @@ import ExitModal from './ExitModal.vue';
 
 const statuses = ['Без статуса', 'Нужно сделать', 'В работе', 'Тестирование', 'Готово'];
 
-const tasks = ref([
-  { id: 1,  title: 'Название задачи', topic: 'Web Design',  date: '30.10.23', status: 'Без статуса', description: '' },
-  { id: 2,  title: 'Название задачи', topic: 'Research',    date: '30.10.23', status: 'Без статуса', description: '' },
-  { id: 3,  title: 'Название задачи', topic: 'Web Design',  date: '30.10.23', status: 'Без статуса', description: '' },
-  { id: 4,  title: 'Название задачи', topic: 'Copywriting', date: '30.10.23', status: 'Без статуса', description: '' },
-  { id: 5,  title: 'Название задачи', topic: 'Web Design',  date: '30.10.23', status: 'Без статуса', description: '' },
-  { id: 6,  title: 'Название задачи', topic: 'Research',    date: '30.10.23', status: 'Нужно сделать', description: '' },
-  { id: 7,  title: 'Название задачи', topic: 'Research',    date: '30.10.23', status: 'В работе', description: '' },
-  { id: 8,  title: 'Название задачи', topic: 'Copywriting', date: '30.10.23', status: 'В работе', description: '' },
-  { id: 9,  title: 'Название задачи', topic: 'Web Design',  date: '30.10.23', status: 'В работе', description: '' },
-  { id: 10, title: 'Название задачи', topic: 'Research',    date: '30.10.23', status: 'Тестирование', description: '' },
-  { id: 11, title: 'Название задачи', topic: 'Research',    date: '30.10.23', status: 'Готово', description: '' }
-]);
+const tasks = ref(initialTasks.map((task) => ({ ...task, description: '' })));
 
 const isNewCardOpen = ref(false);
 const isExitOpen = ref(false);
 const selectedTask = ref(null);
+const loading = ref(true);
 
-let nextId = 12;
+let nextId = initialTasks.length + 1;
+
+onMounted(() => {
+  setTimeout(() => {
+    loading.value = false;
+  }, 3000);
+});
 
 function tasksByStatus(status) {
   return tasks.value.filter((task) => task.status === status);
