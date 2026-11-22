@@ -1,26 +1,61 @@
 <template>
-  <div class="pop-exit" :class="{ _show: open }">
-    <div class="pop-exit__container">
-      <div class="pop-exit__block">
-        <div class="pop-exit__ttl">
-          <h2>Выйти из аккаунта?</h2>
-        </div>
-        <form class="pop-exit__form" action="#" @submit.prevent>
-          <div class="pop-exit__form-group">
-            <button class="pop-exit__exit-yes _hover01" @click.prevent="$emit('confirm')">
-              <a href="#" @click.prevent>Да, выйти</a>
-            </button>
-            <button class="pop-exit__exit-no _hover03" @click.prevent="$emit('close')">
-              <a href="#" @click.prevent>Нет, остаться</a>
-            </button>
-          </div>
-        </form>
+  <div v-if="open" class="overlay" @click.self="$emit('close')">
+    <div class="modal">
+      <h2 class="modal__title">Выйти из аккаунта?</h2>
+      <div class="modal__actions">
+        <button class="modal__button" @click="$emit('close')">Нет</button>
+        <button class="modal__button modal__button--danger" @click="$emit('confirm')">Да, выйти</button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-defineProps({ open: { type: Boolean, default: false } });
-defineEmits(['close', 'confirm']);
+  defineProps({ open: { type: Boolean, default: false } });
+  defineEmits(['close', 'confirm']);
 </script>
+
+<style scoped>
+  .overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.4);
+  }
+
+  .modal {
+    width: 300px;
+    padding: 24px;
+    border-radius: 10px;
+    background: var(--color-bg-card);
+    text-align: center;
+  }
+
+  .modal__title {
+    font-size: 16px;
+  }
+
+  .modal__actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  .modal__button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    background: var(--color-primary);
+    color: #FFFFFF;
+    font-family: inherit;
+    cursor: pointer;
+  }
+
+  .modal__button--danger {
+    background: var(--color-danger);
+  }
+</style>
