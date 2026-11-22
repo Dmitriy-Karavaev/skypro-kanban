@@ -1090,10 +1090,20 @@ body {
   }
 }
 
-/* Vue-адаптация: попапы открываются через состояние, а не через :target */
 .pop-exit._show,
 .pop-new-card._show,
 .pop-browse._show,
 .pop-user-set._show {
   display: block;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  font-size: 24px;
+  font-weight: 600;
+  color: #000000;
+  font-family: 'Montserrat', sans-serif;
 }
