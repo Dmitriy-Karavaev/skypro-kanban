@@ -45,7 +45,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(0, 0, 0, 0.4);
+    background: var(--color-overlay);
   }
 
   .modal {
@@ -53,6 +53,7 @@
     padding: 24px;
     border-radius: 10px;
     background: var(--color-bg-card);
+    box-shadow: var(--shadow-block);
   }
 
   .modal__title {
@@ -87,7 +88,7 @@
     border: none;
     border-radius: 6px;
     background: var(--color-primary);
-    color: #FFFFFF;
+    color: var(--color-white);
     font-family: inherit;
     cursor: pointer;
   }

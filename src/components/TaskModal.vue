@@ -1,7 +1,7 @@
 <template>
   <div class="overlay" @click.self="$emit('close')">
     <div class="modal">
-      <p class="modal__topic" :style="{ backgroundColor: topicColor }">{{ task.topic }}</p>
+      <p class="modal__topic" :style="topicStyle">{{ task.topic }}</p>
       <h2 class="modal__title">{{ task.title }}</h2>
       <p class="modal__description">{{ task.description || 'Описание отсутствует' }}</p>
       <p class="modal__date">Дата: {{ task.date }}</p>
@@ -20,7 +20,7 @@
   const props = defineProps({ task: { type: Object, required: true } });
   defineEmits(['close', 'remove']);
 
-  const topicColor = computed(() => topicColors[props.task.topic] || 'transparent');
+  const topicStyle = computed(() => topicColors[props.task.topic] || {});
 </script>
 
 <style scoped>
@@ -31,7 +31,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(0, 0, 0, 0.4);
+    background: var(--color-overlay);
   }
 
   .modal {
@@ -77,7 +77,7 @@
     border: none;
     border-radius: 6px;
     background: var(--color-primary);
-    color: #FFFFFF;
+    color: var(--color-white);
     font-family: inherit;
     cursor: pointer;
   }

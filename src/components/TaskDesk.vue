@@ -82,6 +82,14 @@
 </script>
 
 <style scoped>
+
+  .container {
+    max-width: 1260px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 30px;
+  }
+
   .main__block {
     padding: 20px 0 40px;
   }
@@ -109,5 +117,13 @@
   .fade-enter-from,
   .fade-leave-to {
     opacity: 0;
+  }
+
+  .wrapper {
+    max-width: 100%;
+    width: 100vw;
+    min-height: 100vh;
+    overflow: hidden;
+    background-color: var(--color-bg);
   }
 </style>

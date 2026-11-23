@@ -23,7 +23,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(0, 0, 0, 0.4);
+    background: var(--color-overlay);
   }
 
   .modal {
@@ -50,7 +50,7 @@
     border: none;
     border-radius: 6px;
     background: var(--color-primary);
-    color: #FFFFFF;
+    color: var(--color-white);
     font-family: inherit;
     cursor: pointer;
   }

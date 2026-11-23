@@ -1,6 +1,6 @@
 <template>
   <article class="task" @click="$emit('open-task', task)">
-    <p class="task__topic" :style="{ backgroundColor: topicColor }">{{ task.topic }}</p>
+    <p class="task__topic" :style="topicStyle">{{ task.topic }}</p>
     <h3 class="task__title">{{ task.title }}</h3>
     <p class="task__date">{{ task.date }}</p>
   </article>
