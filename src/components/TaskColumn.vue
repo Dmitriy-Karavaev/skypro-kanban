@@ -29,6 +29,9 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
+    padding: 12px 14px 18px;
+    border-radius: 10px;
+    background: var(--color-bg-column);
   }
 
   .column__title {

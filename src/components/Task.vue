@@ -15,7 +15,7 @@
   });
   defineEmits(['open-task']);
 
-  const topicColor = computed(() => topicColors[props.task.topic] || 'transparent');
+  const topicStyle = computed(() => topicColors[props.task.topic] || {});
 </script>
 
 <style scoped>

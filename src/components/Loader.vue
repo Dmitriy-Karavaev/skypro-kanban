@@ -27,7 +27,7 @@ defineProps({
 
 .loader__spinner {
   display: block;
-  border: 4px solid rgba(108, 92, 231, 0.2);
+  border: 4px solid var(--color-primary-fade);
   border-top-color: var(--color-primary);
   border-radius: 50%;
   animation: loader-spin 1s linear infinite;
