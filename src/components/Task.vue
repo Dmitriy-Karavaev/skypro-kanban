@@ -1,49 +1,169 @@
 <template>
-  <article class="task" @click="$emit('open-task', task)">
-    <p class="task__topic" :style="topicStyle">{{ task.topic }}</p>
-    <h3 class="task__title">{{ task.title }}</h3>
-    <p class="task__date">{{ task.date }}</p>
-  </article>
+  <div class="cards__item">
+    <RouterLink :to="{ name: 'card', params: { id: card.id } }" class="cards__card card">
+      <div class="card__group">
+        <div class="card__theme" :class="topicClass">
+          <p>{{ card.topic }}</p>
+        </div>
+        <div class="card__btn" aria-label="Открыть карточку">
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+      </div>
+      <div class="card__content">
+        <h3 class="card__title">{{ card.title }}</h3>
+        <div class="card__date">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+            <g clip-path="url(#clip0)">
+              <path d="M10.5625 2.03125H2.4375C1.7644 2.03125 1.21875 2.5769 1.21875 3.25V10.5625C1.21875 11.2356 1.7644 11.7812 2.4375 11.7812H10.5625C11.2356 11.7812 11.7812 11.2356 11.7812 10.5625V3.25C11.7812 2.5769 11.2356 2.03125 10.5625 2.03125Z" stroke="#94A6BE" stroke-width="0.8" stroke-linejoin="round" />
+              <path d="M11.7812 4.0625H1.21875M3.25 1.21875V2.03125V1.21875ZM9.75 1.21875V2.03125V1.21875Z" stroke="#94A6BE" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round" />
+            </g>
+            <defs>
+              <clipPath id="clip0">
+                <rect width="13" height="13" fill="white" />
+              </clipPath>
+            </defs>
+          </svg>
+          <p>{{ card.date }}</p>
+        </div>
+      </div>
+    </RouterLink>
+  </div>
 </template>
 
 <script setup>
   import { computed } from 'vue';
-  import { topicColors } from '../lib/theme';
+  import { RouterLink } from 'vue-router';
 
   const props = defineProps({
-    task: { type: Object, required: true },
+    card: { type: Object, required: true },
   });
-  defineEmits(['open-task']);
 
-  const topicStyle = computed(() => topicColors[props.task.topic] || {});
+  const topicClass = computed(() => {
+    switch (props.card.topic) {
+      case 'Web Design':
+        return '_orange';
+      case 'Research':
+        return '_green';
+      case 'Copywriting':
+        return '_purple';
+      default:
+        return '';
+    }
+  });
 </script>
 
 <style scoped>
-  .task {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding: 12px;
+  .cards__item {
+    padding: 5px;
+    animation-name: card-animation;
+    animation-duration: 500ms;
+    animation-timing-function: linear;
+  }
+
+  .cards__card {
+    width: 220px;
+    height: 130px;
+    padding: 15px 13px 19px;
     border-radius: 10px;
     background: var(--color-bg-card);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
     cursor: pointer;
   }
 
-  .task__topic {
-    align-self: flex-start;
-    padding: 5px 8px;
-    border-radius: 4px;
-    font-size: 12px;
+  @keyframes card-animation {
+    0% {
+      height: 0;
+      opacity: 0;
+    }
+
+    100% {
+      height: auto;
+      opacity: 1;
+    }
   }
 
-  .task__title {
+  .card__group {
+    width: 100%;
+    height: 20px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .card__theme {
+    height: 20px;
+    padding: 5px 14px;
+    border-radius: 18px;
+  }
+
+  .card__theme p {
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 10px;
+  }
+
+  .card__btn {
+    width: 24px;
+    height: 24px;
+    padding: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+  }
+
+  .card__btn div {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--color-text-muted);
+  }
+
+  .card__title {
+    margin-bottom: 10px;
     font-size: 14px;
     font-weight: 500;
+    line-height: 18px;
+    color: var(--color-text);
   }
 
-  .task__date {
-    margin-top: auto;
-    font-size: 12px;
+  .card__content {
+    height: 64px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  .card__date {
+    display: flex;
+    align-items: center;
+  }
+
+  .card__date p {
+    margin-left: 6px;
+    font-size: 10px;
+    line-height: 13px;
+    letter-spacing: 0.2px;
     color: var(--color-text-muted);
+  }
+
+  ._orange {
+    background: #FFE4C2;
+    color: #FF6D00;
+  }
+
+  ._green {
+    background: #B4FDD1;
+    color: #06B16E;
+  }
+
+  ._purple {
+    background: #E9D4FF;
+    color: #9A48F1;
   }
 </style>
