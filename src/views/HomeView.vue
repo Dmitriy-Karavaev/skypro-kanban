@@ -5,18 +5,18 @@
       <div class="container">
         <div class="main__block">
           <div class="main__content">
-            <Column v-for="column in columns" :key="column.title" :title="column.title" :cards="column.cards" />
+            <AppColumn v-for="column in columns" :key="column.title" :title="column.title" :cards="column.cards" />
           </div>
+          <RouterView />
         </div>
       </div>
     </main>
   </div>
 </template>
 
-vue
 <script setup>
 import { computed } from 'vue';
-import Column from '@/components/Column.vue';
+import AppColumn from '@/components/AppColumn.vue';
 import BaseHeader from '@/components/BaseHeader.vue';
 import { columnTitles } from '@/lib/data';
 import { store } from '@/lib/store';

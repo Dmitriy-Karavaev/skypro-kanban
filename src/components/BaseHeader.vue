@@ -2,9 +2,9 @@
   <header class="header">
     <div class="container">
       <div class="header__block">
-        <a href="/" class="header__logo">
+        <RouterLink to="/" class="header__logo">
           <img src="@/assets/logo.png" alt="Skypro" />
-        </a>
+        </RouterLink>
         <nav class="header__nav">
           <RouterLink to="/card/add" class="header__btn-main-new">
             Создать новую задачу
@@ -51,10 +51,10 @@ function handleClickOutside(event) {
     isPopupOpen.value = false;
   }
 }
+
 function logout() {
-  localStorage.removeItem('userInfo');
   isPopupOpen.value = false;
-  router.push('/login');
+  router.push('/exit');
 }
 
 onMounted(() => document.addEventListener('click', handleClickOutside));

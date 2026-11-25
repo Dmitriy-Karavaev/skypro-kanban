@@ -1,70 +1,60 @@
 <template>
-  <div class="wrapper">
-    <BaseHeader />
+  <div class="modal-overlay" @click.self="close">
+    <div class="pop-new-card__block">
+      <div class="pop-new-card__content">
+        <h3 class="pop-new-card__ttl">Создание задачи</h3>
+        <button class="pop-new-card__close" aria-label="Закрыть" @click="close">
+          ✕
+        </button>
 
-    <main class="main">
-      <div class="container">
-        <div class="main__block">
-          <div class="pop-new-card__block">
-            <div class="pop-new-card__content">
-              <h3 class="pop-new-card__ttl">Создание задачи</h3>
-              <RouterLink to="/" class="pop-new-card__close" aria-label="Закрыть">
-                ✕
-              </RouterLink>
+        <div class="pop-new-card__wrap">
+          <form class="pop-new-card__form form-new" @submit.prevent>
+            <div class="form-new__block">
+              <label for="formTitle" class="subttl">Название задачи</label>
+              <input id="formTitle" v-model.trim="title" class="form-new__input" type="text"
+                placeholder="Введите название задачи..." @input="clearError" />
+              <p v-if="error" class="form-error">{{ error }}</p>
+            </div>
+            <div class="form-new__block">
+              <label for="textArea" class="subttl">Описание задачи</label>
+              <textarea id="textArea" v-model.trim="description" class="form-new__area"
+                placeholder="Введите описание задачи..."></textarea>
+            </div>
+          </form>
 
-              <div class="pop-new-card__wrap">
-                <form class="pop-new-card__form form-new" @submit.prevent>
-                  <div class="form-new__block">
-                    <label for="formTitle" class="subttl">Название задачи</label>
-                    <input id="formTitle" v-model.trim="title" class="form-new__input" type="text"
-                      placeholder="Введите название задачи..." @input="clearError" />
-                    <p v-if="error" class="form-error">{{ error }}</p>
-                  </div>
-                  <div class="form-new__block">
-                    <label for="textArea" class="subttl">Описание задачи</label>
-                    <textarea id="textArea" v-model.trim="description" class="form-new__area"
-                      placeholder="Введите описание задачи..."></textarea>
-                  </div>
-                </form>
-
-                <div class="pop-new-card__calendar calendar">
-                  <p class="calendar__ttl subttl">Даты</p>
-                  <div class="calendar__block">
-                    <label for="dateInput" class="subttl">Срок исполнения</label>
-                    <input id="dateInput" v-model="deadline" class="form-new__input" type="date"
-                      @input="clearDateError" />
-                    <p v-if="dateError" class="form-error">{{ dateError }}</p>
-                  </div>
-                </div>
-              </div>
-
-              <div class="pop-new-card__categories categories">
-                <p class="categories__p subttl">Категория</p>
-                <div class="categories__themes">
-                  <div v-for="topic in topics" :key="topic.name" class="categories__theme" :class="[
-                    topic.className,
-                    { '_active-category': topic.name === selectedTopic },
-                  ]" @click="selectedTopic = topic.name">
-                    <p :class="topic.className">{{ topic.name }}</p>
-                  </div>
-                </div>
-              </div>
-
-              <button class="form-new__create _btn-bg" type="button" @click="onCreate">
-                Создать задачу
-              </button>
+          <div class="pop-new-card__calendar calendar">
+            <p class="calendar__ttl subttl">Даты</p>
+            <div class="calendar__block">
+              <label for="dateInput" class="subttl">Срок исполнения</label>
+              <input id="dateInput" v-model="deadline" class="form-new__input" type="date" @input="clearDateError" />
+              <p v-if="dateError" class="form-error">{{ dateError }}</p>
             </div>
           </div>
         </div>
+
+        <div class="pop-new-card__categories categories">
+          <p class="categories__p subttl">Категория</p>
+          <div class="categories__themes">
+            <div v-for="topic in topics" :key="topic.name" class="categories__theme" :class="[
+              topic.className,
+              { '_active-category': topic.name === selectedTopic },
+            ]" @click="selectedTopic = topic.name">
+              <p :class="topic.className">{{ topic.name }}</p>
+            </div>
+          </div>
+        </div>
+
+        <button class="form-new__create _btn-bg" type="button" @click="onCreate">
+          Создать задачу
+        </button>
       </div>
-    </main>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue';
-import { RouterLink, useRouter } from 'vue-router';
-import BaseHeader from '@/components/BaseHeader.vue';
+import { useRouter } from 'vue-router';
 import { addCard } from '@/lib/store';
 
 const router = useRouter();
@@ -95,6 +85,10 @@ function clearDateError() {
   if (dateError.value) dateError.value = '';
 }
 
+function close() {
+  router.push('/');
+}
+
 function onCreate() {
   error.value = '';
   dateError.value = '';
@@ -116,28 +110,19 @@ function onCreate() {
 </script>
 
 <style scoped>
-.wrapper {
-  min-height: 100vh;
-  background: var(--color-bg);
-}
-
-.container {
-  max-width: 1260px;
-  width: 100%;
-  margin: 0 auto;
-  padding: 0 30px;
-}
-
-.main {
-  background: var(--color-bg-main);
-}
-
-.main__block {
-  padding: 25px 0 49px;
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 10;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  overflow-y: auto;
+  padding: 40px 16px;
 }
 
 .pop-new-card__block {
-  margin: 0 auto;
   background-color: var(--color-bg-card);
   max-width: 793px;
   width: 100%;
@@ -161,7 +146,9 @@ function onCreate() {
   right: 30px;
   color: var(--color-text-muted);
   font-size: 20px;
-  text-decoration: none;
+  background: none;
+  border: none;
+  outline: none;
   cursor: pointer;
 }
 

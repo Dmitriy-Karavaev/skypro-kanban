@@ -1,102 +1,94 @@
 <template>
-  <div class="wrapper">
-    <BaseHeader />
+  <div class="modal-overlay" @click.self="close">
+    <div v-if="card" class="pop-browse__block">
+      <div class="pop-browse__top-block">
+        <h3 v-if="!editing" class="pop-browse__ttl">
+          Задача №{{ route.params.id }}. {{ card.title }}
+        </h3>
+        <input v-else v-model.trim="form.title" class="pop-browse__ttl-input" type="text"
+          placeholder="Название задачи" />
+        <button class="pop-browse__close" aria-label="Закрыть" @click="close">
+          ✕
+        </button>
+      </div>
 
-    <main class="main">
-      <div class="container">
-        <div class="main__block">
-          <div v-if="card" class="pop-browse__block">
-            <div class="pop-browse__top-block">
-              <h3 v-if="!editing" class="pop-browse__ttl">{{ card.title }}</h3>
-              <input v-else v-model.trim="form.title" class="pop-browse__ttl-input" type="text"
-                placeholder="Название задачи" />
-              <RouterLink to="/" class="pop-browse__close" aria-label="Закрыть">
-                ✕
-              </RouterLink>
-            </div>
-
-            <div class="pop-browse__wrap">
-              <div class="pop-browse__form">
-                <div class="categories">
-                  <p class="categories__p subttl">Категория</p>
-                  <div class="categories__themes">
-                    <button v-for="topic in topics" :key="topic" type="button" class="categories__theme"
-                      :class="[topicClassOf(topic), { _active: editing && form.topic === topic }]" :disabled="!editing"
-                      @click="form.topic = topic">
-                      <p>{{ topic }}</p>
-                    </button>
-                  </div>
-                </div>
-
-                <div class="form-browse__block">
-                  <p class="subttl">Описание задачи</p>
-                  <div v-if="!editing" class="form-browse__area">
-                    {{ description }}
-                  </div>
-                  <textarea v-else v-model="form.description" class="form-browse__area"
-                    placeholder="Введите описание задачи..."></textarea>
-                  <p v-if="editing && formError" class="form-error">{{ formError }}</p>
-                </div>
-              </div>
-
-              <div class="pop-browse__btn-browse">
-                <div class="status">
-                  <p class="status__p subttl">Статус</p>
-                  <div v-if="!editing" class="status__themes">
-                    <div class="status__theme">
-                      <p>{{ card.status }}</p>
-                    </div>
-                  </div>
-                  <div v-else class="status__themes">
-                    <button v-for="item in store.statuses" :key="item" type="button"
-                      class="status__theme status__theme-btn" :class="{ _active: form.status === item }"
-                      @click="selectStatus(item)">
-                      <p>{{ item }}</p>
-                    </button>
-                  </div>
-                </div>
-
-                <div class="status">
-                  <p class="status__p subttl">Дата исполнения</p>
-                  <div class="status__themes">
-                    <div v-if="!editing" class="status__theme">
-                      <p>{{ card.date }}</p>
-                    </div>
-                    <input v-else v-model="form.date" class="status__date-input" type="date" />
-                  </div>
-                </div>
-
-                <template v-if="!editing">
-                  <button class="_btn-bg _hover01" type="button" @click="startEdit">
-                    Редактировать
-                  </button>
-                  <button class="_btn-bor _hover03" type="button" @click="removeCard">
-                    Удалить
-                  </button>
-                </template>
-                <template v-else>
-                  <button class="_btn-bg _hover01" type="button" @click="saveEdit">
-                    Сохранить
-                  </button>
-                  <button class="_btn-bor _hover03" type="button" @click="cancelEdit">
-                    Отмена
-                  </button>
-                </template>
-              </div>
+      <div class="pop-browse__wrap">
+        <div class="pop-browse__form">
+          <div class="categories">
+            <p class="categories__p subttl">Категория</p>
+            <div class="categories__themes">
+              <button v-for="topic in topics" :key="topic" type="button" class="categories__theme"
+                :class="[topicClassOf(topic), { _active: editing && form.topic === topic }]" :disabled="!editing"
+                @click="form.topic = topic">
+                <p>{{ topic }}</p>
+              </button>
             </div>
           </div>
 
-          <p v-else class="not-found">Карточка не найдена</p>
+          <div class="form-browse__block">
+            <p class="subttl">Описание задачи</p>
+            <div v-if="!editing" class="form-browse__area">
+              {{ description }}
+            </div>
+            <textarea v-else v-model="form.description" class="form-browse__area"
+              placeholder="Введите описание задачи..."></textarea>
+            <p v-if="editing && formError" class="form-error">{{ formError }}</p>
+          </div>
+        </div>
+
+        <div class="pop-browse__btn-browse">
+          <div class="status">
+            <p class="status__p subttl">Статус</p>
+            <div v-if="!editing" class="status__themes">
+              <div class="status__theme">
+                <p>{{ card.status }}</p>
+              </div>
+            </div>
+            <div v-else class="status__themes">
+              <button v-for="item in store.statuses" :key="item" type="button" class="status__theme status__theme-btn"
+                :class="{ _active: form.status === item }" @click="selectStatus(item)">
+                <p>{{ item }}</p>
+              </button>
+            </div>
+          </div>
+
+          <div class="status">
+            <p class="status__p subttl">Дата исполнения</p>
+            <div class="status__themes">
+              <div v-if="!editing" class="status__theme">
+                <p>{{ card.date }}</p>
+              </div>
+              <input v-else v-model="form.date" class="status__date-input" type="date" />
+            </div>
+          </div>
+
+          <template v-if="!editing">
+            <button class="_btn-bg _hover01" type="button" @click="startEdit">
+              Редактировать
+            </button>
+            <button class="_btn-bor _hover03" type="button" @click="removeCard">
+              Удалить
+            </button>
+          </template>
+          <template v-else>
+            <button class="_btn-bg _hover01" type="button" @click="saveEdit">
+              Сохранить
+            </button>
+            <button class="_btn-bor _hover03" type="button" @click="cancelEdit">
+              Отмена
+            </button>
+          </template>
         </div>
       </div>
-    </main>
+    </div>
+
+    <p v-else class="not-found">Карточка не найдена</p>
   </div>
 </template>
 
 <script setup>
 import { computed, reactive, ref } from 'vue';
-import { RouterLink, useRoute, useRouter } from 'vue-router';
-import BaseHeader from '@/components/BaseHeader.vue';
+import { useRoute, useRouter } from 'vue-router';
 import { store } from '@/lib/store';
 
 const route = useRoute();
@@ -152,6 +144,10 @@ function fromIsoDate(iso) {
   return `${d}.${m}.${y}`;
 }
 
+function close() {
+  router.push('/');
+}
+
 function startEdit() {
   form.title = card.value.title;
   form.description = card.value.description || '';
@@ -195,29 +191,19 @@ function removeCard() {
 </script>
 
 <style scoped>
-.wrapper {
-  min-height: 100vh;
-  background: var(--color-bg);
-}
-
-.container {
-  max-width: 1260px;
-  width: 100%;
-  margin: 0 auto;
-  padding: 0 30px;
-}
-
-.main {
-  background: var(--color-bg-main);
-}
-
-.main__block {
-  padding: 25px 0 49px;
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 10;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  overflow-y: auto;
+  padding: 40px 16px;
 }
 
 .pop-browse__block {
-  display: block;
-  margin: 0 auto;
   background-color: var(--color-bg-card);
   max-width: 630px;
   width: 100%;
@@ -255,7 +241,9 @@ function removeCard() {
 
 .pop-browse__close {
   color: var(--color-text-muted);
-  text-decoration: none;
+  background: none;
+  border: none;
+  outline: none;
   font-size: 16px;
   cursor: pointer;
 }
@@ -441,7 +429,7 @@ function removeCard() {
 
 .not-found {
   text-align: center;
-  color: var(--color-text-muted);
+  color: var(--color-white);
   font-size: 20px;
   padding: 40px 0;
 }
