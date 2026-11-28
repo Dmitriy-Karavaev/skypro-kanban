@@ -10,11 +10,11 @@
             Создать новую задачу
           </RouterLink>
           <a href="#" ref="userLink" class="header__user" @click.prevent="togglePopup">
-            Ivan Ivanov
+            {{ user.name }}
           </a>
           <div v-if="isPopupOpen" ref="popup" class="header__pop-user-set">
-            <p class="pop-user-set__name">Ivan Ivanov</p>
-            <p class="pop-user-set__mail">ivan.ivanov@gmail.com</p>
+            <p class="pop-user-set__name">{{ user.name }}</p>
+            <p class="pop-user-set__mail">{{ user.login }}</p>
             <div class="pop-user-set__theme">
               <p>Тёмная тема</p>
               <input type="checkbox" class="checkbox" />
@@ -35,6 +35,8 @@ const isPopupOpen = ref(false);
 const popup = ref(null);
 const userLink = ref(null);
 const router = useRouter();
+
+const user = ref(JSON.parse(localStorage.getItem('userInfo') || 'null') || {});
 
 function togglePopup() {
   isPopupOpen.value = !isPopupOpen.value;

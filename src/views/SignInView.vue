@@ -9,7 +9,9 @@
           <input id="loginPassword" v-model="password" class="modal__input" type="password" name="password"
             autocomplete="current-password" placeholder="Пароль" @input="clearError" />
           <p v-if="error" class="modal__error">{{ error }}</p>
-          <button class="modal__btn-enter _hover01" type="submit">Войти</button>
+          <button class="modal__btn-enter _hover01" type="submit" :disabled="isSubmitting">
+            {{ isSubmitting ? 'Входим...' : 'Войти' }}
+          </button>
           <p class="modal__reg-hint">
             Не зарегистрированы?
             <RouterLink to="/register" class="modal__reg-link">
@@ -25,31 +27,40 @@
 <script setup>
 import { ref } from 'vue';
 import { RouterLink, useRouter } from 'vue-router';
+import { authApi } from '../services/auth';
 
 const router = useRouter();
 
 const email = ref('');
 const password = ref('');
 const error = ref('');
+const isSubmitting = ref(false);
 
-function onSubmit() {
+async function onSubmit() {
+  error.value = '';
+
   if (!email.value || !password.value) {
     error.value = 'Заполните почту и пароль';
     return;
   }
 
-  const users = JSON.parse(localStorage.getItem('users') || '[]');
-  const user = users.find(
-    (u) => u.email === email.value && u.password === password.value
-  );
-
-  if (!user) {
-    error.value = 'Пользователь с такими данными не найден';
-    return;
+  isSubmitting.value = true;
+  try {
+    const data = await authApi.login({
+      login: email.value,
+      password: password.value,
+    });
+    const token = data.user?.token || data.token;
+    if (token) localStorage.setItem('token', token);
+    if (data.user) {
+      localStorage.setItem('userInfo', JSON.stringify(data.user));
+    }
+    router.push('/');
+  } catch (e) {
+    error.value = e.message || 'Не удалось войти. Попробуйте ещё раз';
+  } finally {
+    isSubmitting.value = false;
   }
-
-  localStorage.setItem('userInfo', JSON.stringify(user));
-  router.push('/');
 }
 
 function clearError() {
