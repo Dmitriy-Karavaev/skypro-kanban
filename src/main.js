@@ -1,11 +1,11 @@
 import { createApp } from 'vue';
 import App from './App.vue';
+import router from './router';
 import './assets/main.css';
-import { theme } from './lib/theme'; // импорт объекта цветов
+import { theme } from './lib/theme';
 
-// превращаем объект в CSS-переменные на корне страницы
 for (const [name, value] of Object.entries(theme)) {
   document.documentElement.style.setProperty(`--${name}`, value);
 }
 
-createApp(App).mount('#app');
+createApp(App).use(router).mount('#app');

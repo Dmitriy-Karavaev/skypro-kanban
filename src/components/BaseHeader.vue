@@ -2,133 +2,218 @@
   <header class="header">
     <div class="container">
       <div class="header__block">
-        <a href="#" class="header__logo">skypro</a>
-        <div class="header__actions">
-          <button class="header__create" @click="$emit('create-task')">Создать новую задачу</button>
-          <button class="header__user" @click="isPopupOpen = !isPopupOpen">
-            Ivan Ivanov <span class="header__arrow">▾</span>
-          </button>
-          <div class="header__pop-user-set" :class="{ _show: isPopupOpen }">
-            <p class="header__popup-name">Ivan Ivanov</p>
-            <p class="header__popup-mail">ivan.ivanov@mail.ru</p>
-            <button
-              class="header__popup-exit"
-              @click="isPopupOpen = false; $emit('exit')"
-            >Выйти</button>
+        <RouterLink to="/" class="header__logo">
+          <img src="@/assets/logo.png" alt="Skypro" />
+        </RouterLink>
+        <nav class="header__nav">
+          <RouterLink to="/card/add" class="header__btn-main-new">
+            Создать новую задачу
+          </RouterLink>
+          <a href="#" ref="userLink" class="header__user" @click.prevent="togglePopup">
+            Ivan Ivanov
+          </a>
+          <div v-if="isPopupOpen" ref="popup" class="header__pop-user-set">
+            <p class="pop-user-set__name">Ivan Ivanov</p>
+            <p class="pop-user-set__mail">ivan.ivanov@gmail.com</p>
+            <div class="pop-user-set__theme">
+              <p>Тёмная тема</p>
+              <input type="checkbox" class="checkbox" />
+            </div>
+            <button type="button" @click="logout">Выйти</button>
           </div>
-        </div>
+        </nav>
       </div>
     </div>
   </header>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { RouterLink, useRouter } from 'vue-router';
 
-defineEmits(['create-task', 'exit']);
 const isPopupOpen = ref(false);
+const popup = ref(null);
+const userLink = ref(null);
+const router = useRouter();
+
+function togglePopup() {
+  isPopupOpen.value = !isPopupOpen.value;
+}
+
+function handleClickOutside(event) {
+  if (
+    isPopupOpen.value &&
+    popup.value &&
+    !popup.value.contains(event.target) &&
+    userLink.value &&
+    !userLink.value.contains(event.target)
+  ) {
+    isPopupOpen.value = false;
+  }
+}
+
+function logout() {
+  isPopupOpen.value = false;
+  router.push('/exit');
+}
+
+onMounted(() => document.addEventListener('click', handleClickOutside));
+onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside));
 </script>
 
+
 <style scoped>
+.container {
+  max-width: 1260px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 30px;
+}
+
+/* ---------- шапка ---------- */
 .header {
-  background: var(--color-bg-header);
+  width: 100%;
+  background: var(--color-bg-card);
 }
 
 .header__block {
+  height: 70px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 70px;
-}
-
-.header__logo {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--color-text);
-  text-decoration: none;
-}
-
-.header__actions {
   position: relative;
+  padding: 0 10px;
+}
+
+.header__logo img {
+  width: 85px;
+}
+
+.header__nav {
   display: flex;
   align-items: center;
-  gap: 16px;
+  position: relative;
 }
 
-.header__create {
-  padding: 10px 16px;
+.header__btn-main-new {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 178px;
+  height: 30px;
+  margin-right: 20px;
   border: none;
   border-radius: 4px;
   background: var(--color-primary);
   color: var(--color-white);
-  font-family: inherit;
-  font-size: 12px;
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
+  transition: background 0.2s;
 }
 
-.header__create:hover {
+.header__btn-main-new:hover {
   background: var(--color-primary-hover);
 }
 
 .header__user {
-  padding: 10px 16px;
-  border: none;
-  border-radius: 4px;
-  background: var(--color-bg-card);
-  color: var(--color-text);
-  font-family: inherit;
-  font-size: 12px;
-  cursor: pointer;
+  display: flex;
+  align-items: center;
+  height: 20px;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.header__user::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  margin: -6px 0 0 5px;
+  border-left: 1.9px solid var(--color-primary);
+  border-bottom: 1.9px solid var(--color-primary);
+  transform: rotate(-45deg);
 }
 
 .header__user:hover {
   color: var(--color-primary-hover);
 }
 
+.header__user:hover::after {
+  border-left-color: var(--color-primary-hover);
+  border-bottom-color: var(--color-primary-hover);
+}
+
 .header__pop-user-set {
-  display: none;
   position: absolute;
-  top: 60px;
+  top: 61px;
   right: 0;
-  z-index: 10;
-  min-width: 180px;
-  padding: 16px;
+  width: 213px;
+  height: 205px;
+  padding: 34px;
+  border: 0.7px solid var(--color-input-border);
   border-radius: 10px;
   background: var(--color-bg-card);
   box-shadow: var(--shadow-popup);
+  text-align: center;
+  z-index: 2;
 }
 
-.header__pop-user-set._show {
-  display: block;
-}
-
-.header__popup-name {
+.pop-user-set__name {
+  margin-bottom: 4px;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 500;
 }
 
-.header__popup-mail {
-  margin-top: 4px;
-  font-size: 12px;
+.pop-user-set__mail {
+  margin-bottom: 10px;
+  font-size: 14px;
   color: var(--color-text-muted);
 }
 
-.header__popup-exit {
-  margin-top: 12px;
-  padding: 8px 12px;
-  width: 100%;
-  border: none;
-  border-radius: 6px;
-  background: var(--color-danger);
-  color: var(--color-white);
-  font-family: inherit;
+.pop-user-set__theme {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 30px;
+  font-size: 14px;
+}
+
+.pop-user-set__theme input {
+  position: relative;
+  width: 24px;
+  height: 13px;
+  border-radius: 100px;
+  background: var(--color-bg-main);
+  appearance: none;
   cursor: pointer;
 }
 
-.container {
-  max-width: 1260px;
-  width: 100%;
-  margin: 0 auto;
-  padding: 0 30px;
+.pop-user-set__theme input::before {
+  content: '';
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--color-text-muted);
+  transition: 0.5s;
+}
+
+.pop-user-set__theme input:checked::before {
+  left: 12px;
+}
+
+.header__pop-user-set button {
+  width: 72px;
+  height: 30px;
+  background: transparent;
+  border: 1px solid var(--color-primary);
+  border-radius: 4px;
+  color: var(--color-primary);
+  cursor: pointer;
 }
 </style>
