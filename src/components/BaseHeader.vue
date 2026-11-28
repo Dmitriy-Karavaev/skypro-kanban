@@ -96,6 +96,10 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
 }
 
 .header__btn-main-new {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
   width: 178px;
   height: 30px;
   margin-right: 20px;
