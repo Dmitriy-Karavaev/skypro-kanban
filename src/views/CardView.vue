@@ -5,7 +5,7 @@
         <h3 v-if="!editing" class="pop-browse__ttl">
           Задача №{{ route.params.id }}. {{ card.title }}
         </h3>
-        <input v-else v-model.trim="form.title" class="pop-browse__ttl-input" type="text"
+        <input v-else id="card-title" name="title" v-model.trim="form.title" class="pop-browse__ttl-input" type="text"
           placeholder="Название задачи" />
         <button class="pop-browse__close" aria-label="Закрыть" @click="close">
           ✕
@@ -30,8 +30,8 @@
             <div v-if="!editing" class="form-browse__area">
               {{ description }}
             </div>
-            <textarea v-else v-model="form.description" class="form-browse__area"
-              placeholder="Введите описание задачи..."></textarea>
+            <textarea v-else id="card-description" name="description" v-model="form.description"
+              class="form-browse__area" placeholder="Введите описание задачи..."></textarea>
             <p v-if="editing && formError" class="form-error">{{ formError }}</p>
           </div>
         </div>
@@ -58,26 +58,28 @@
               <div v-if="!editing" class="status__theme">
                 <p>{{ card.date }}</p>
               </div>
-              <input v-else v-model="form.date" class="status__date-input" type="date" />
+              <input v-else id="card-deadline" name="deadline" v-model="form.date" class="status__date-input"
+                type="date" />
             </div>
           </div>
 
           <template v-if="!editing">
-            <button class="_btn-bg _hover01" type="button" @click="startEdit">
+            <button class="_btn-bg _hover01" type="button" :disabled="isSaving" @click="startEdit">
               Редактировать
             </button>
-            <button class="_btn-bor _hover03" type="button" @click="removeCard">
+            <button class="_btn-bor _hover03" type="button" :disabled="isSaving" @click="removeCard">
               Удалить
             </button>
           </template>
           <template v-else>
-            <button class="_btn-bg _hover01" type="button" @click="saveEdit">
-              Сохранить
+            <button class="_btn-bg _hover01" type="button" :disabled="isSaving" @click="saveEdit">
+              {{ isSaving ? 'Сохраняем...' : 'Сохранить' }}
             </button>
-            <button class="_btn-bor _hover03" type="button" @click="cancelEdit">
+            <button class="_btn-bor _hover03" type="button" :disabled="isSaving" @click="cancelEdit">
               Отмена
             </button>
           </template>
+          <p v-if="serverError" class="form-error">{{ serverError }}</p>
         </div>
       </div>
     </div>
@@ -89,7 +91,7 @@
 <script setup>
 import { computed, reactive, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { store } from '@/lib/store';
+import { store, updateCard, removeCard as removeCardApi } from '@/lib/store';
 
 const route = useRoute();
 const router = useRouter();
@@ -102,6 +104,8 @@ const card = computed(() =>
 
 const editing = ref(false);
 const formError = ref('');
+const serverError = ref('');
+const isSaving = ref(false);
 const form = reactive({
   title: '',
   description: '',
@@ -138,12 +142,6 @@ function toIsoDate(dmy) {
   return `${year}-${m}-${d}`;
 }
 
-function fromIsoDate(iso) {
-  if (!iso) return '';
-  const [y, m, d] = iso.split('-');
-  return `${d}.${m}.${y}`;
-}
-
 function close() {
   router.push('/');
 }
@@ -155,38 +153,60 @@ function startEdit() {
   form.date = toIsoDate(card.value.date);
   form.status = card.value.status;
   formError.value = '';
+  serverError.value = '';
   editing.value = true;
 }
 
 function cancelEdit() {
   editing.value = false;
   formError.value = '';
+  serverError.value = '';
 }
 
 function selectStatus(item) {
   form.status = item;
 }
 
-function saveEdit() {
+async function saveEdit() {
   if (!form.title) {
     formError.value = 'Введите название задачи';
     return;
   }
+  if (!form.date) {
+    formError.value = 'Выберите срок исполнения';
+    return;
+  }
 
-  card.value.title = form.title;
-  card.value.description = form.description;
-  card.value.topic = form.topic;
-  card.value.date = fromIsoDate(form.date) || card.value.date;
-  card.value.status = form.status;
-
-  editing.value = false;
+  isSaving.value = true;
+  serverError.value = '';
+  try {
+    // form.date в формате YYYY-MM-DD, в ISO его превратит updateCard
+    await updateCard(card.value.id, {
+      title: form.title,
+      description: form.description,
+      topic: form.topic,
+      status: form.status,
+      date: form.date,
+    });
+    editing.value = false;
+  } catch (e) {
+    serverError.value = e.message;
+  } finally {
+    isSaving.value = false;
+  }
 }
 
-function removeCard() {
-  store.cards = store.cards.filter(
-    (item) => String(item.id) !== String(card.value.id)
-  );
-  router.push('/');
+async function removeCard() {
+  isSaving.value = true;
+  serverError.value = '';
+  try {
+    await removeCardApi(card.value.id);
+    router.push('/');
+  } catch (e) {
+    serverError.value = e.message;
+  } finally {
+    isSaving.value = false;
+  }
 }
 </script>
 

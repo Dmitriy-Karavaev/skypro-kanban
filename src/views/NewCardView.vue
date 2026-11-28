@@ -8,16 +8,16 @@
         </button>
 
         <div class="pop-new-card__wrap">
-          <form class="pop-new-card__form form-new" @submit.prevent>
+          <form class="pop-new-card__form form-new" @submit.prevent="onCreate">
             <div class="form-new__block">
               <label for="formTitle" class="subttl">Название задачи</label>
-              <input id="formTitle" v-model.trim="title" class="form-new__input" type="text"
+              <input id="formTitle" name="title" v-model.trim="title" class="form-new__input" type="text"
                 placeholder="Введите название задачи..." @input="clearError" />
               <p v-if="error" class="form-error">{{ error }}</p>
             </div>
             <div class="form-new__block">
               <label for="textArea" class="subttl">Описание задачи</label>
-              <textarea id="textArea" v-model.trim="description" class="form-new__area"
+              <textarea id="textArea" name="description" v-model.trim="description" class="form-new__area"
                 placeholder="Введите описание задачи..."></textarea>
             </div>
           </form>
@@ -26,7 +26,8 @@
             <p class="calendar__ttl subttl">Даты</p>
             <div class="calendar__block">
               <label for="dateInput" class="subttl">Срок исполнения</label>
-              <input id="dateInput" v-model="deadline" class="form-new__input" type="date" @input="clearDateError" />
+              <input id="dateInput" name="deadline" v-model="deadline" class="form-new__input" type="date"
+                @input="clearDateError" />
               <p v-if="dateError" class="form-error">{{ dateError }}</p>
             </div>
           </div>
@@ -44,9 +45,10 @@
           </div>
         </div>
 
-        <button class="form-new__create _btn-bg" type="button" @click="onCreate">
-          Создать задачу
+        <button class="form-new__create _btn-bg" type="submit" :disabled="isSubmitting" @click="onCreate">
+          {{ isSubmitting ? 'Отправляем...' : 'Создать задачу' }}
         </button>
+        <p v-if="serverError" class="form-error">{{ serverError }}</p>
       </div>
     </div>
   </div>
@@ -71,11 +73,8 @@ const deadline = ref('');
 const selectedTopic = ref('Web Design');
 const error = ref('');
 const dateError = ref('');
-
-function formatDate(value) {
-  const [year, month, day] = value.split('-');
-  return `${day}.${month}.${year.slice(2)}`;
-}
+const serverError = ref('');
+const isSubmitting = ref(false);
 
 function clearError() {
   if (error.value) error.value = '';
@@ -89,23 +88,34 @@ function close() {
   router.push('/');
 }
 
-function onCreate() {
+async function onCreate() {
+  if (isSubmitting.value) return;
+
   error.value = '';
   dateError.value = '';
+  serverError.value = '';
 
   if (!title.value) error.value = 'Введите название задачи';
   if (!deadline.value) dateError.value = 'Выберите срок исполнения';
 
   if (error.value || dateError.value) return;
 
-  addCard({
-    title: title.value,
-    description: description.value,
-    topic: selectedTopic.value,
-    date: formatDate(deadline.value),
-  });
-
-  router.push('/');
+  isSubmitting.value = true;
+  try {
+    // дату отдаём как есть — '2026-11-28',
+    // в ISO её превратит addCard в store.js
+    await addCard({
+      title: title.value,
+      description: description.value,
+      topic: selectedTopic.value,
+      date: deadline.value,
+    });
+    router.push('/');
+  } catch (e) {
+    serverError.value = e.message;
+  } finally {
+    isSubmitting.value = false;
+  }
 }
 </script>
 
@@ -279,6 +289,11 @@ function onCreate() {
 
 ._btn-bg:hover {
   background: var(--color-primary-hover);
+}
+
+._btn-bg:disabled {
+  opacity: 0.6;
+  cursor: default;
 }
 
 .form-new__create {

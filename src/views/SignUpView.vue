@@ -11,8 +11,8 @@
           <input id="regPassword" v-model="password" class="modal__input" type="password" name="password"
             autocomplete="new-password" placeholder="Пароль" @input="clearError" />
           <p v-if="error" class="modal__error">{{ error }}</p>
-          <button class="modal__btn-enter _hover01" type="submit">
-            Зарегистрироваться
+          <button class="modal__btn-enter _hover01" type="submit" :disabled="isSubmitting">
+            {{ isSubmitting ? 'Регистрируем...' : 'Зарегистрироваться' }}
           </button>
           <p class="modal__reg-hint">
             Уже есть аккаунт?
@@ -27,6 +27,7 @@
 <script setup>
 import { ref } from 'vue';
 import { RouterLink, useRouter } from 'vue-router';
+import { authApi } from '../services/auth';
 
 const router = useRouter();
 
@@ -34,30 +35,34 @@ const name = ref('');
 const email = ref('');
 const password = ref('');
 const error = ref('');
+const isSubmitting = ref(false);
 
-function onSubmit() {
+async function onSubmit() {
+  error.value = '';
+
   if (!name.value || !email.value || !password.value) {
     error.value = 'Заполните все поля';
     return;
   }
 
-  const users = JSON.parse(localStorage.getItem('users') || '[]');
-
-  if (users.some((u) => u.email === email.value)) {
-    error.value = 'Пользователь с такой почтой уже зарегистрирован';
-    return;
+  isSubmitting.value = true;
+  try {
+    const data = await authApi.register({
+      login: email.value,
+      name: name.value,
+      password: password.value,
+    });
+    const token = data.user?.token || data.token;
+    if (token) localStorage.setItem('token', token);
+    if (data.user) {
+      localStorage.setItem('userInfo', JSON.stringify(data.user));
+    }
+    router.push('/');
+  } catch (e) {
+    error.value = e.message || 'Не удалось зарегистрироваться. Попробуйте ещё раз';
+  } finally {
+    isSubmitting.value = false;
   }
-
-  const user = {
-    name: name.value,
-    email: email.value,
-    password: password.value,
-  };
-
-  users.push(user);
-  localStorage.setItem('users', JSON.stringify(users));
-  localStorage.setItem('userInfo', JSON.stringify(user));
-  router.push('/');
 }
 
 function clearError() {
